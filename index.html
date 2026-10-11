@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0614">
+  <title>❤</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- All text, colours and content come from config.js -->
+  <script src="config.js"></script>
+</head>
+<body class="locked">
+
+  <!-- Loader -->
+  <div id="loader">
+    <div class="loader-heart">❤</div>
+    <p data-t="loader"></p>
+  </div>
+
+  <!-- 3D background: stars + floating hearts -->
+  <canvas id="bg3d"></canvas>
+
+  <!-- Session over: study reminder, then back to login -->
+  <div id="sessionEnd" class="modal session-end hidden">
+    <div class="modal-card">
+      <div class="modal-emoji">📚</div>
+      <h3 data-t="sessionEndTitle"></h3>
+      <p class="modal-text" data-t="sessionEndText"></p>
+      <p class="session-count" id="sessionCount"></p>
+    </div>
+  </div>
+
+  <!-- Session timer (after login) -->
+  <div id="sessionTimer" class="session-timer hidden" aria-live="off"><span>⏳</span><b id="sessionTime">30:00</b></div>
+
+  <button id="musicBtn" class="music-btn hidden" aria-label="Music on/off">
+    <span class="bars"><i></i><i></i><i></i></span>
+    <span class="music-label"><span class="on" data-t="musicOn"></span><span class="off" data-t="musicOff"></span></span>
+  </button>
+
+  <!-- Countdown gate -->
+  <section id="gate" class="screen hidden">
+    <p class="eyebrow" data-t="gateEyebrow"></p>
+    <h2 class="gate-title"><span data-t="gateTitle"></span> <span class="beat">❤</span></h2>
+    <div class="countdown">
+      <div class="cd-box"><span id="cdD">00</span><small data-t="unitDays"></small></div>
+      <div class="cd-box"><span id="cdH">00</span><small data-t="unitHours"></small></div>
+      <div class="cd-box"><span id="cdM">00</span><small data-t="unitMinutes"></small></div>
+      <div class="cd-box"><span id="cdS">00</span><small data-t="unitSeconds"></small></div>
+    </div>
+    <p class="gate-note" data-t="gateNote"></p>
+    <button id="enableSurprise" class="btn btn-glow surprise-btn" data-t="surpriseBtn"></button>
+    <p class="surprise-status" id="surpriseStatus"></p>
+    <button id="gateReplayGames" class="btn btn-ghost gate-replay hidden" data-t="gateReplayBtn"></button>
+  </section>
+
+  <!-- Midnight surprise options -->
+  <div id="surpriseModal" class="modal hidden">
+    <div class="modal-card">
+      <button class="modal-close" aria-label="Close">×</button>
+      <div class="modal-emoji">🤫</div>
+      <h3 data-t="modalTitle"></h3>
+      <p class="modal-text" data-t="modalText"></p>
+      <button id="icsBtn" class="opt-btn">
+        <span class="opt-ico">⏰</span>
+        <span class="opt-txt"><b data-t="icsTitle"></b><small data-t="icsSub"></small></span>
+      </button>
+      <a id="gcalBtn" class="opt-btn" target="_blank" rel="noopener">
+        <span class="opt-ico">📅</span>
+        <span class="opt-txt"><b data-t="gcalTitle"></b><small data-t="gcalSub"></small></span>
+      </a>
+      <button id="pushBtn" class="opt-btn hidden">
+        <span class="opt-ico">🔔</span>
+        <span class="opt-txt"><b data-t="pushTitle"></b><small data-t="pushSub"></small></span>
+      </button>
+      <p id="iosHint" class="ios-hint hidden" data-t="iosHint"></p>
+    </div>
+  </div>
+
+  <!-- Tap to begin (first tap starts the song) -->
+  <section id="begin" class="screen hidden">
+    <div class="begin-heart"><span>💖</span><i></i><i></i><i></i></div>
+    <h2 class="begin-title" data-t="beginTitle"></h2>
+    <p class="begin-sub" data-t="beginSub"></p>
+    <button id="beginBtn" class="btn btn-glow" data-t="beginBtn"></button>
+  </section>
+
+  <!-- Romantic login -->
+  <section id="login" class="screen hidden">
+    <div class="moon"><i></i><i></i><i></i></div>
+    <div class="heart-rain" id="heartRain"></div>
+
+    <div class="login-wrap" id="loginWrap">
+      <div class="login-card" id="loginCard">
+        <div class="login-lock" id="loginLock">🔒</div>
+        <h2 class="login-title" data-t="loginTitle"></h2>
+        <p class="login-sub" data-t="loginSub"></p>
+        <form id="loginForm" autocomplete="off" novalidate>
+          <div class="field">
+            <span class="field-label">👤 <span data-t="usernameLabel"></span></span>
+            <div class="field-pair">
+              <label class="field-box">
+                <input class="login-user" type="text" placeholder=" " autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                <span class="ph" data-t="username1Placeholder"></span>
+              </label>
+              <label class="field-box">
+                <input class="login-user" type="text" placeholder=" " autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                <span class="ph" data-t="username2Placeholder"></span>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">🔑 <span data-t="passwordLabel"></span>
+              <button type="button" class="eye" id="togglePass" aria-label="Show password">👁️</button>
+            </span>
+            <div class="field-pair">
+              <label class="field-box">
+                <input class="login-pass" type="password" placeholder=" " autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                <span class="ph" data-t="password1Placeholder"></span>
+              </label>
+              <label class="field-box">
+                <input class="login-pass" type="password" placeholder=" " autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+                <span class="ph" data-t="password2Placeholder"></span>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">🤫 <span data-t="secretLabel"></span></span>
+            <label class="field-box field-single">
+              <input class="login-secret" type="password" placeholder=" " autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+              <span class="ph" data-t="secretPlaceholder"></span>
+            </label>
+          </div>
+          <p class="login-hint" data-t="loginHint"></p>
+          <p class="login-error" id="loginError" aria-live="polite"></p>
+          <button type="submit" class="btn btn-glow login-btn" id="loginBtn" data-t="loginBtn"></button>
+        </form>
+      </div>
+
+      <!-- Rope + couple on a scooter that drags the card in -->
+      <div class="rope" id="rope"></div>
+      <div class="bike" id="bike">
+        <svg viewBox="0 0 300 160" aria-hidden="true">
+          <defs>
+            <linearGradient id="beamG" x1="0" x2="1"><stop offset="0" stop-color="#fff6c2" stop-opacity=".75"/><stop offset="1" stop-color="#fff6c2" stop-opacity="0"/></linearGradient>
+            <linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7aa8"/><stop offset="1" stop-color="#c2185b"/></linearGradient>
+          </defs>
+          <polygon class="beam" points="256,88 470,40 470,150" fill="url(#beamG)"/>
+          <!-- floating heart -->
+          <path class="bike-heart" d="M148 6 c-6 -9 -20 -4 -16 7 c3 7 16 14 16 14 s13 -7 16 -14 c4 -11 -10 -16 -16 -7z" fill="#ff4d8d"/>
+          <!-- girl (behind) -->
+          <path d="M104 46 Q 92 58 84 74 Q 98 66 108 58 Z" fill="#2a1424"/>
+          <path d="M110 70 L 128 98 L 140 102" stroke="#f1c7a5" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M98 72 Q 100 50 116 44 Q 130 42 134 56 L 132 72 Z" fill="#ff4d8d"/>
+          <path d="M126 52 Q 146 56 160 54" stroke="#ff4d8d" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <circle cx="120" cy="32" r="11" fill="#f1c7a5"/>
+          <path d="M108 32 Q 108 18 121 18 Q 133 18 132 30 Q 124 24 110 36 Z" fill="#2a1424"/>
+          <!-- boy (front) -->
+          <path d="M150 70 L 186 96 L 202 100" stroke="#1d1030" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M140 72 Q 142 44 160 38 Q 178 36 182 50 L 178 72 Z" fill="#3b1d63"/>
+          <path d="M172 46 Q 200 44 228 42" stroke="#3b1d63" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <circle cx="170" cy="26" r="12" fill="#f1c7a5"/>
+          <path d="M157 26 Q 157 11 171 12 Q 184 13 182 24 Q 172 18 158 28 Z" fill="#1b0f22"/>
+          <!-- scooter -->
+          <path d="M40 112 Q 38 80 80 76 L 150 76 Q 160 76 163 86 L 168 100 L 222 100 L 236 52 L 246 52 L 232 106 Q 228 120 210 120 L 86 120 Q 70 120 62 114 Z" fill="url(#bodyG)"/>
+          <rect x="78" y="68" width="92" height="12" rx="6" fill="#3a1650"/>
+          <path d="M240 52 L 232 38 L 222 38" stroke="#d9c6e6" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle class="headlight" cx="250" cy="88" r="7" fill="#fff6c2"/>
+          <circle cx="42" cy="96" r="5" fill="#ff3355"/>
+          <g class="wheel"><circle cx="72" cy="124" r="24" fill="#1a0d26" stroke="#4a3a5a" stroke-width="6"/><path d="M72 104 V144 M52 124 H92 M58 110 L86 138 M86 110 L58 138" stroke="#9a8aaa" stroke-width="2"/><circle cx="72" cy="124" r="6" fill="#d9c6e6"/></g>
+          <g class="wheel"><circle cx="222" cy="124" r="24" fill="#1a0d26" stroke="#4a3a5a" stroke-width="6"/><path d="M222 104 V144 M202 124 H242 M208 110 L236 138 M236 110 L208 138" stroke="#9a8aaa" stroke-width="2"/><circle cx="222" cy="124" r="6" fill="#d9c6e6"/></g>
+        </svg>
+        <span class="puff"></span><span class="puff"></span><span class="puff"></span>
+      </div>
+
+      <!-- Cupid's arrow -->
+      <div class="arrow" id="arrow">
+        <svg viewBox="0 0 240 48" aria-hidden="true">
+          <path d="M8 14 L34 24 L8 34 L22 24 Z M24 10 L46 24 L24 38 L36 24 Z" fill="#ff7aa8"/>
+          <line x1="20" y1="24" x2="200" y2="24" stroke="#ffd27a" stroke-width="5" stroke-linecap="round"/>
+          <path d="M214 16 c-6 -9 -20 -4 -16 7 c3 7 16 14 16 14 s13 -7 16 -14 c4 -11 -10 -16 -16 -7z" transform="rotate(-90 214 18) translate(0 6)" fill="#ff2d6f"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Games intro -->
+  <section id="gamesIntro" class="screen hidden">
+    <div class="gi-icon">🎮</div>
+    <h2 class="gi-title" data-t="gamesIntroTitle"></h2>
+    <p class="gi-text" data-t="gamesIntroText"></p>
+    <div class="gi-steps" id="giSteps"></div>
+    <p class="gi-progress hidden" id="giProgress"></p>
+    <div class="gi-rewards hidden" id="giRewards"></div>
+    <div class="gi-actions">
+      <button id="enterGames" class="btn btn-glow" data-t="gamesIntroBtn"></button>
+      <button id="restartGames" class="btn btn-ghost hidden" data-t="gamesRestartBtn"></button>
+    </div>
+  </section>
+
+  <!-- After all games: get ready to open the lock with the treasure numbers -->
+  <section id="lockIntro" class="screen hidden">
+    <div class="lock-icon">🔐</div>
+    <h2 class="gi-title" data-t="lockIntroTitle"></h2>
+    <p class="gi-text" data-t="lockIntroText"></p>
+    <div class="gi-rewards hidden" id="lockRewards"></div>
+    <button id="lockReady" class="btn btn-glow" data-t="lockIntroBtn"></button>
+  </section>
+
+  <!-- The 4-key lock -->
+  <section id="lockGame" class="screen hidden">
+    <div class="login-wrap game-wrap">
+      <div class="login-card game-card" id="lockCard">
+        <div class="login-lock" id="lockBadge">🔐</div>
+        <p class="game-step" id="lockStageText"></p>
+        <h2 class="login-title" id="lockTitle"></h2>
+        <p class="game-question" id="lockQuestion"></p>
+        <form id="lockForm" autocomplete="off" novalidate>
+          <div class="game-timer hidden" id="lockTimer"><div class="game-timer-fill" id="lockTimerFill"></div><span id="lockTimerText">01:00</span></div>
+          <div id="lockBody"></div>
+          <p class="login-error" id="lockError" aria-live="polite"></p>
+          <button type="submit" class="btn btn-glow login-btn" id="lockBtn"></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lucky draw: 15 face-down cards, a few tries -->
+  <section id="luckyDraw" class="screen hidden">
+    <div class="lucky-wrap">
+      <div class="lock-icon">🎁</div>
+      <h2 class="gi-title" data-t="luckyTitle"></h2>
+      <p class="gi-text" data-t="luckyText"></p>
+      <p class="lucky-tries" id="luckyTries"></p>
+      <div class="lucky-tray hidden" id="luckyTray"></div>
+      <div class="lucky-grid" id="luckyGrid"></div>
+      <p class="lucky-msg" id="luckyMsg"></p>
+      <div class="lucky-summary hidden" id="luckySummary"></div>
+      <div class="lucky-send hidden" id="luckySend">
+        <p class="lucky-send-text" data-t="luckySendText"></p>
+        <a class="btn btn-ghost lucky-wa" id="luckyWa" target="_blank" rel="noopener" data-t="luckyWhatsApp"></a>
+        <div class="gi-actions">
+          <button type="button" id="luckySent" class="btn btn-glow" data-t="luckySentBtn"></button>
+          <button type="button" id="luckyNotSent" class="btn btn-ghost" data-t="luckyNotSentBtn"></button>
+        </div>
+        <p class="lucky-nag" id="luckyNag"></p>
+      </div>
+      <button id="luckyNext" class="btn btn-glow hidden" data-t="luckyNext"></button>
+    </div>
+  </section>
+
+  <!-- "Not sent yet?" popup -->
+  <div id="luckyNagModal" class="modal lucky-nag-modal hidden">
+    <div class="modal-card">
+      <div class="modal-emoji" id="luckyNagEmoji">😤</div>
+      <h3 data-t="luckyNagTitle"></h3>
+      <p class="modal-text lucky-nag-big" id="luckyNagText"></p>
+      <button type="button" id="luckyNagOk" class="btn btn-glow" data-t="luckyNagOk"></button>
+    </div>
+  </div>
+
+  <!-- Lock status in the top-right corner -->
+  <div id="lockHud" class="lock-hud hidden">
+    <div class="lock-big" id="lockBig">🔒</div>
+    <div class="lock-info"><div class="lock-slots" id="lockSlots"></div><b id="lockPct"></b></div>
+  </div>
+
+  <!-- One game at a time -->
+  <section id="game" class="screen hidden">
+    <div class="login-wrap game-wrap">
+      <div class="login-card game-card" id="gameCard">
+        <div class="login-lock" id="gameBadge">🎯</div>
+        <p class="game-step" id="gameStep"></p>
+        <h2 class="login-title" id="gameTitle"></h2>
+        <p class="game-question" id="gameQuestion"></p>
+        <div class="game-equation hidden" id="gameEquation"></div>
+        <figure class="game-picture hidden" id="gamePictureBox">
+          <img id="gamePicture" alt="">
+          <figcaption data-t="pictureTapHint"></figcaption>
+        </figure>
+        <form id="gameForm" autocomplete="off" novalidate>
+          <div class="game-timer hidden" id="gameTimer"><div class="game-timer-fill" id="gameTimerFill"></div><span id="gameTimerText">01:00</span></div>
+          <div class="table-grid hidden" id="tableGrid"></div>
+          <div class="quiz-area hidden" id="quizArea"></div>
+          <div class="treasure-area hidden" id="treasureArea"></div>
+          <div class="dice-area hidden" id="diceArea">
+            <div class="dice-scene"><div class="dice" id="dice"></div></div>
+            <p class="dice-count" id="diceCount"></p>
+            <p class="dice-msg" id="diceMsg"></p>
+          </div>
+          <div class="cards-area hidden" id="cardsArea">
+            <p class="cards-try" id="cardsTry"></p>
+            <div class="cards-table" id="cardsTable"></div>
+            <p class="cards-msg" id="cardsMsg"></p>
+          </div>
+          <div class="kiss-area hidden" id="kissArea">
+            <button type="button" class="kiss-mic" id="kissMic" aria-label="Mic"><span>🎤</span><i></i><i></i><i></i></button>
+            <div class="kiss-meter"><div id="kissLevel"></div></div>
+            <p class="kiss-status" id="kissStatus"></p>
+            <button type="button" class="btn btn-ghost kiss-fallback hidden" id="kissTap"></button>
+            <div class="kiss-burst" id="kissBurst"></div>
+          </div>
+          <div class="catch-area hidden" id="catchArea">
+            <div class="catch-hud"><span id="catchScore">⭐ 0 / 500</span><span id="catchTime">⏱️ 01:00</span></div>
+            <div class="catch-legend" id="catchLegend"></div>
+            <div class="catch-stage">
+              <canvas id="catchCanvas"></canvas>
+              <div class="catch-overlay" id="catchOverlay"></div>
+            </div>
+          </div>
+          <div class="puzzle-area hidden" id="puzzleArea">
+            <div class="puzzle-board" id="puzzleBoard"></div>
+            <img class="puzzle-peek" id="puzzlePeek" alt="">
+            <p class="puzzle-status" id="puzzleStatus"></p>
+          </div>
+          <label class="field-box" id="guessField">
+            <input id="gameAnswer" type="text" placeholder=" " autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+            <span class="ph" id="gamePh"></span>
+          </label>
+          <p class="game-hint hidden" id="gameHint"></p>
+          <p class="login-error" id="gameError" aria-live="polite"></p>
+          <button type="submit" class="btn btn-glow login-btn" id="gameBtn" data-t="gameBtn"></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Surprise video (card game prize) -->
+  <div id="videoModal" class="modal video-modal hidden">
+    <div class="video-box">
+      <video id="surpriseVideo" controls playsinline preload="none"></video>
+      <div class="video-actions hidden" id="videoActions">
+        <button type="button" id="videoAgain" class="btn btn-ghost" data-t="videoAgain"></button>
+        <button type="button" id="videoNext" class="btn btn-glow" data-t="videoNext"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tap-to-zoom for game pictures -->
+  <div id="pictureZoom" class="picture-zoom hidden"><img id="pictureZoomImg" alt=""><button type="button" class="lb-btn lb-close" aria-label="Close">×</button></div>
+
+  <!-- Gift intro -->
+  <section id="intro" class="screen hidden">
+    <div class="gift" id="gift">
+      <div class="gift-glow"></div>
+      <div class="gift-lid"><div class="bow"></div></div>
+      <div class="gift-box"></div>
+    </div>
+    <h2 class="intro-title" data-t="introTitle"></h2>
+    <p class="intro-sub" data-t="introSub"></p>
+    <button id="openGift" class="btn btn-glow" data-t="introBtn"></button>
+  </section>
+
+  <main id="main" class="hidden">
+
+    <!-- HERO + 3D cake -->
+    <section id="hero">
+      <div class="hero-text">
+        <p class="eyebrow" id="heroDate" data-t="heroEyebrow"></p>
+        <h1 class="hb" id="hb" data-t="heroTitle"></h1>
+        <h2 class="name" id="heroName"></h2>
+      </div>
+      <canvas id="cake3d"></canvas>
+      <div class="hero-actions">
+        <button id="blowBtn" class="btn btn-glow" data-t="blowBtn"></button>
+        <button id="micBtn" class="btn btn-ghost" data-t="micBtn"></button>
+      </div>
+      <p id="wishMsg" class="wish-msg"></p>
+      <div class="scroll-hint"><span class="mouse"></span><span data-t="scrollHint"></span></div>
+    </section>
+
+    <div class="marquee"><div class="marquee-track" id="marquee1"></div></div>
+
+    <!-- Together counter -->
+    <section id="together" class="compact">
+      <h2 class="section-title" data-t="togetherTitle"></h2>
+      <p class="section-sub" id="togetherDate"></p>
+      <div class="counter">
+        <div class="ct-box"><span id="tD">0</span><small data-t="unitDays"></small></div>
+        <div class="ct-box"><span id="tH">0</span><small data-t="unitHours"></small></div>
+        <div class="ct-box"><span id="tM">0</span><small data-t="unitMinutes"></small></div>
+        <div class="ct-box"><span id="tS">0</span><small data-t="unitSeconds"></small></div>
+      </div>
+      <p class="section-sub small" data-t="togetherFooter"></p>
+    </section>
+
+    <!-- 3D photo carousel -->
+    <section id="moments">
+      <h2 class="section-title" data-t="momentsTitle"></h2>
+      <p class="section-sub" data-t="momentsSub"></p>
+      <div class="stage" id="stage"><div class="ring" id="ring"></div></div>
+    </section>
+
+    <!-- Timeline -->
+    <section id="story">
+      <h2 class="section-title" data-t="storyTitle"></h2>
+      <p class="section-sub" data-t="storySub"></p>
+      <div class="timeline" id="timeline">
+        <div class="tl-line"><div class="tl-progress" id="tlProgress"></div></div>
+      </div>
+    </section>
+
+    <div class="marquee reverse"><div class="marquee-track" id="marquee2"></div></div>
+
+    <!-- Polaroid wall -->
+    <section id="wall-sec">
+      <h2 class="section-title" data-t="wallTitle"></h2>
+      <p class="section-sub" data-t="wallSub"></p>
+      <div class="wall" id="wall"></div>
+    </section>
+
+    <!-- Reasons -->
+    <section id="reasons">
+      <h2 class="section-title" data-t="reasonsTitle"></h2>
+      <p class="section-sub" data-t="reasonsSub"></p>
+      <div class="reasons-grid" id="reasonsGrid"></div>
+    </section>
+
+    <!-- Scratch gift cards -->
+    <section id="gifts">
+      <h2 class="section-title" data-t="giftsTitle"></h2>
+      <p class="section-sub" data-t="giftsSub"></p>
+      <div class="gifts-grid" id="giftsGrid"></div>
+    </section>
+
+    <!-- Letter -->
+    <section id="letter">
+      <h2 class="section-title" data-t="letterTitle"></h2>
+      <p class="section-sub" id="letterHint" data-t="letterHint"></p>
+      <div class="envelope" id="envelope">
+        <div class="env-back"></div>
+        <div class="env-letter"><span data-t="envelopeLabel"></span></div>
+        <div class="env-front"></div>
+        <div class="env-flap"><div class="env-seal">❤</div></div>
+      </div>
+      <div class="letter-card hidden" id="letterCard">
+        <div class="letter-text" id="letterText"></div>
+        <p class="letter-sign" data-t="letterSignature"></p>
+      </div>
+    </section>
+
+    <!-- Finale -->
+    <section id="finale">
+      <canvas id="fireworks"></canvas>
+      <div class="finale-content">
+        <h2 class="finale-title" data-t="finaleTitle"></h2>
+        <p class="finale-sub" data-t="finaleMessage"></p>
+        <button id="replayBtn" class="btn btn-glow" data-t="replayBtn"></button>
+      </div>
+      <footer data-t="footer"></footer>
+    </section>
+  </main>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox hidden">
+    <button class="lb-btn lb-close" aria-label="Close">×</button>
+    <button class="lb-btn lb-prev" aria-label="Previous">‹</button>
+    <figure><img id="lbImg" alt=""><video id="lbVideo" class="hidden" controls playsinline preload="metadata"></video><figcaption id="lbCap"></figcaption></figure>
+    <button class="lb-btn lb-next" aria-label="Next">›</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
